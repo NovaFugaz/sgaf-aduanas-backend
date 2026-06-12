@@ -1,0 +1,26 @@
+version: '3.9'
+services:
+  ms-auth:
+    volumes:
+      - ./ms-auth:/app:cached
+    command: ["/app/server"]
+
+  ms-usuarios:
+    volumes:
+      - ./ms-usuarios:/workspace:cached
+
+  ms-tramites:
+    volumes:
+      - ./ms-tramites:/workspace:cached
+
+  ms-integraciones:
+    volumes:
+      - ./ms-integraciones:/app:cached
+
+  ms-reportes:
+    volumes:
+      - ./ms-reportes:/workspace:cached
+
+  ms-auditoria:
+    volumes:
+      - ./ms-auditoria:/app:cached
