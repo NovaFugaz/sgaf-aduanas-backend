@@ -73,7 +73,7 @@ class UsuarioService(
             throw EmailAlreadyExistsException("El correo ${request.correo} ya está registrado")
         }
 
-        val hashedPassword = passwordEncoder.encode(request.password)
+        val hashedPassword = passwordEncoder.encode(request.password)!!
 
         val usuario = Usuario(
             run = request.run,
