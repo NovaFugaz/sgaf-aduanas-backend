@@ -107,7 +107,7 @@ func (r *postgresEventoRepo) FindAll(ctx context.Context, filters map[string]int
 	argOffsetIdx := len(args)
 
 	query := fmt.Sprintf(`
-	SELECT id, entidad, entidad_id, accion, usuario_id, usuario_rol, detalle, ip_origen, timestamp
+	SELECT id, entidad, entidad_id, accion, usuario_id, usuario_rol, detalle, ip_origen::text, timestamp
 	FROM eventos_auditoria
 	%s
 	ORDER BY timestamp DESC
@@ -232,7 +232,7 @@ func (r *postgresEventoRepo) ExportStream(ctx context.Context, filters map[strin
 	limitIdx := len(args)
 
 	query := fmt.Sprintf(`
-	SELECT timestamp, entidad, entidad_id, accion, usuario_id, usuario_rol, detalle, ip_origen
+	SELECT timestamp, entidad, entidad_id, accion, usuario_id, usuario_rol, detalle, ip_origen::text
 	FROM eventos_auditoria
 	%s
 	ORDER BY timestamp DESC
