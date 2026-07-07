@@ -3,6 +3,7 @@ package domain
 import (
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
@@ -50,6 +51,34 @@ type UserResponse struct {
 	Activo bool   `json:"activo"`
 }
 
+func (u *User) ToResponse() *UserResponse {
+	if u == nil {
+		return nil
+	}
+
+	resp := &UserResponse{
+		ID:     u.ID.String(),
+		RUN:    u.RUN,
+		Nombre: u.Nombre,
+		Correo: u.Correo,
+		Rol:    u.Rol,
+		Activo: u.Activo,
+	}
+	if u.Aduana != nil {
+		resp.Aduana = *u.Aduana
+	}
+	return resp
+}
+
+// JWTClaims represents JWT token claims
+type JWTClaims struct {
+	jwt.RegisteredClaims
+	RUN    string `json:"run"`
+	Nombre string `json:"nombre"`
+	Rol    string `json:"rol"`
+	Aduana string `json:"aduana,omitempty"`
+}
+
 // LoginRequest is the request body for login
 type LoginRequest struct {
 	RUN      string `json:"run" binding:"required"`
@@ -92,6 +121,6 @@ type ErrorResponse struct {
 
 // APIResponse is the standard response envelope
 type APIResponse struct {
-	Data  interface{}   `json:"data"`
+	Data  interface{}    `json:"data"`
 	Error *ErrorResponse `json:"error"`
 }

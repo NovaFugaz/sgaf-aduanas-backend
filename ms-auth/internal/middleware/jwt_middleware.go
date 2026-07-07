@@ -65,10 +65,22 @@ func RequireAuth(cfg *config.Config, redisClient *redis.Client, logger *zap.Logg
 			return
 		}
 
-		claims := token.Claims.(*domain.JWTClaims)
+		claims, ok := token.Claims.(*domain.JWTClaims)
+		if !ok {
+			logger.Debug("invalid token claims during auth middleware")
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"data": nil,
+				"error": gin.H{
+					"code":    "UNAUTHORIZED",
+					"message": "invalid token claims",
+				},
+			})
+			c.Abort()
+			return
+		}
 
 		// Check blocklist
-		blocklistKey := "blocklist:" + claims.JTI
+		blocklistKey := "blocklist:" + claims.ID
 		blocked, err := redisClient.Exists(c.Request.Context(), blocklistKey).Result()
 		if err != nil {
 			logger.Error("failed to check blocklist", zap.Error(err))
@@ -84,7 +96,7 @@ func RequireAuth(cfg *config.Config, redisClient *redis.Client, logger *zap.Logg
 		}
 
 		if blocked > 0 {
-			logger.Debug("token revoked", zap.String("jti", claims.JTI))
+			logger.Debug("token revoked", zap.String("jti", claims.ID))
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"data": nil,
 				"error": gin.H{
@@ -152,10 +164,22 @@ func RequireRole(cfg *config.Config, redisClient *redis.Client, logger *zap.Logg
 			return
 		}
 
-		claims := token.Claims.(*domain.JWTClaims)
+		claims, ok := token.Claims.(*domain.JWTClaims)
+		if !ok {
+			logger.Debug("invalid token claims during role middleware")
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"data": nil,
+				"error": gin.H{
+					"code":    "UNAUTHORIZED",
+					"message": "invalid token claims",
+				},
+			})
+			c.Abort()
+			return
+		}
 
 		// Check blocklist
-		blocklistKey := "blocklist:" + claims.JTI
+		blocklistKey := "blocklist:" + claims.ID
 		blocked, err := redisClient.Exists(c.Request.Context(), blocklistKey).Result()
 		if err != nil {
 			logger.Error("failed to check blocklist", zap.Error(err))
@@ -223,7 +247,7 @@ func LoggingMiddleware(logger *zap.Logger) gin.HandlerFunc {
 		userID := "anonymous"
 		if claims, exists := c.Get("claims"); exists {
 			if jwtClaims, ok := claims.(*domain.JWTClaims); ok {
-				userID = jwtClaims.Sub
+				userID = jwtClaims.Subject
 			}
 		}
 

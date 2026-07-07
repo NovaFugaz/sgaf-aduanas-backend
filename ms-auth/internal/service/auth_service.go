@@ -167,13 +167,16 @@ func (s *AuthService) Refresh(ctx context.Context, req *RefreshRequest) (*LoginR
 		return nil, fmt.Errorf("INVALID_TOKEN")
 	}
 
-	claims := token.Claims.(*domain.JWTClaims)
+	claims, ok := token.Claims.(*domain.JWTClaims)
+	if !ok {
+		return nil, fmt.Errorf("invalid token claims")
+	}
 
 	// Check if refresh token exists in Redis
-	refreshKey := fmt.Sprintf("refresh:%s", claims.JTI)
+	refreshKey := fmt.Sprintf("refresh:%s", claims.ID)
 	userID, err := s.redisClient.Get(ctx, refreshKey).Result()
 	if err == redis.Nil {
-		s.logger.Info("refresh failed: token revoked or expired", zap.String("jti", claims.JTI))
+		s.logger.Info("refresh failed: token revoked or expired", zap.String("jti", claims.ID))
 		return nil, fmt.Errorf("INVALID_TOKEN")
 	} else if err != nil {
 		s.logger.Error("failed to check refresh token", zap.Error(err))
@@ -248,23 +251,27 @@ func (s *AuthService) Logout(ctx context.Context, tokenString string) error {
 
 	// Calculate remaining lifetime
 	now := time.Now()
-	expirationTime := time.Unix(claims.EXP, 0)
+	if claims.ExpiresAt == nil {
+		return fmt.Errorf("invalid token expiration")
+	}
+
+	expirationTime := claims.ExpiresAt.Time
 	remainingLifetime := expirationTime.Sub(now)
 
 	if remainingLifetime <= 0 {
-		s.logger.Info("token already expired", zap.String("jti", claims.JTI))
+		s.logger.Info("token already expired", zap.String("jti", claims.ID))
 		return nil
 	}
 
 	// Add to blocklist with TTL
-	key := fmt.Sprintf("blocklist:%s", claims.JTI)
+	key := fmt.Sprintf("blocklist:%s", claims.ID)
 	err = s.redisClient.Set(ctx, key, "1", remainingLifetime).Err()
 	if err != nil {
 		s.logger.Error("failed to add token to blocklist", zap.Error(err))
 		return fmt.Errorf("failed to add token to blocklist: %w", err)
 	}
 
-	s.logger.Info("user logged out", zap.String("jti", claims.JTI))
+	s.logger.Info("user logged out", zap.String("jti", claims.ID))
 	return nil
 }
 
@@ -282,10 +289,13 @@ func (s *AuthService) ValidateToken(ctx context.Context, tokenString string) (*d
 		return nil, fmt.Errorf("INVALID_TOKEN")
 	}
 
-	claims := token.Claims.(*domain.JWTClaims)
+	claims, ok := token.Claims.(*domain.JWTClaims)
+	if !ok {
+		return nil, fmt.Errorf("invalid token claims")
+	}
 
 	// Check blocklist (fast Redis check)
-	blocklistKey := fmt.Sprintf("blocklist:%s", claims.JTI)
+	blocklistKey := fmt.Sprintf("blocklist:%s", claims.ID)
 	blocked, err := s.redisClient.Exists(ctx, blocklistKey).Result()
 	if err != nil {
 		s.logger.Error("failed to check blocklist", zap.Error(err))
@@ -293,7 +303,7 @@ func (s *AuthService) ValidateToken(ctx context.Context, tokenString string) (*d
 	}
 
 	if blocked > 0 {
-		s.logger.Info("token revoked", zap.String("jti", claims.JTI))
+		s.logger.Info("token revoked", zap.String("jti", claims.ID))
 		return nil, fmt.Errorf("TOKEN_REVOKED")
 	}
 
@@ -306,14 +316,18 @@ func (s *AuthService) generateAccessToken(user *domain.User) (string, string, er
 	exp := now.Add(AccessTokenDuration)
 
 	claims := &domain.JWTClaims{
-		JTI:    jti,
-		Sub:    user.ID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ID:        jti,
+			Subject:   user.ID.String(),
+			IssuedAt:  jwt.NewNumericDate(now),
+			ExpiresAt: jwt.NewNumericDate(exp),
+		},
 		RUN:    user.RUN,
 		Nombre: user.Nombre,
 		Rol:    user.Rol,
-		Aduana: user.Aduana,
-		IAT:    now.Unix(),
-		EXP:    exp.Unix(),
+	}
+	if user.Aduana != nil {
+		claims.Aduana = *user.Aduana
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -332,10 +346,12 @@ func (s *AuthService) generateRefreshToken(user *domain.User) (string, string, e
 	exp := now.Add(RefreshTokenDuration)
 
 	claims := &domain.JWTClaims{
-		JTI: jti,
-		Sub: user.ID,
-		IAT: now.Unix(),
-		EXP: exp.Unix(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ID:        jti,
+			Subject:   user.ID.String(),
+			IssuedAt:  jwt.NewNumericDate(now),
+			ExpiresAt: jwt.NewNumericDate(exp),
+		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

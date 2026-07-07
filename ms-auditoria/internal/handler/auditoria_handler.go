@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/csv"
 	"fmt"
 	"net/http"
@@ -337,12 +338,12 @@ func (h *AuditoriaHandler) Health(c *gin.Context) {
 	defer cancel()
 
 	postgresStatus := "ok"
-	records, err := h.svc.ObtenerEventos(ctx, map[string]interface{}{}, 0, 1)
+	records, _, err := h.svc.ObtenerEventos(ctx, map[string]interface{}{}, 0, 1)
 	if err != nil && (len(records) == 0 && err.Error() != "") {
 		postgresStatus = "error"
 	}
 
-	countToday, err := h.svc.ObtenerResumen(ctx)
+	_, _, _, countToday, err := h.svc.ObtenerResumen(ctx)
 	if err != nil {
 		countToday = 0
 	}

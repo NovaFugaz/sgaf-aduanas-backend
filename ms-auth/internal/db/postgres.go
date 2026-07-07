@@ -37,9 +37,3 @@ func CheckPostgres(ctx context.Context, pool *pgxpool.Pool) bool {
 	}
 	return true
 }
-		// Don't fail if migration already exists
-	}
-
-	logger.Info("migrations completed")
-	return nil
-}

@@ -17,7 +17,6 @@ spring:
     show-sql: false
   flyway:
     enabled: true
-    baseline-on-migrate: true
 
 springdoc:
   api-docs:

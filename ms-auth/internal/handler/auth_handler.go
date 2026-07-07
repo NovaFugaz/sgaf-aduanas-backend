@@ -190,7 +190,7 @@ func (h *AuthHandler) Me(c *gin.Context) {
 	}
 
 	jwtClaims := claims.(*domain.JWTClaims)
-	resp, err := h.authService.GetUserByID(c.Request.Context(), jwtClaims.Sub)
+	resp, err := h.authService.GetUserByID(c.Request.Context(), jwtClaims.Subject)
 	if err != nil {
 		c.JSON(http.StatusNotFound, Response{
 			Data: nil,
