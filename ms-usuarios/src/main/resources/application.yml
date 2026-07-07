@@ -17,6 +17,9 @@ spring:
     show-sql: false
   flyway:
     enabled: true
+    table: flyway_schema_history_usuarios
+    baseline-on-migrate: true
+    baseline-version: '0'
 
 springdoc:
   api-docs:

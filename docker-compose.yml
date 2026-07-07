@@ -22,7 +22,7 @@ services:
       - "6379:6379"
 
   traefik:
-    image: traefik:v3.0
+    image: traefik:latest
     command:
       - --entryPoints.web.address=:80
       - --api.insecure=false
@@ -35,6 +35,7 @@ services:
       - "8080:8080"
     environment:
       - TRAEFIK_DASHBOARD_AUTH=${TRAEFIK_DASHBOARD_AUTH}
+      - DOCKER_API_VERSION=1.44
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
