@@ -13,16 +13,28 @@ repositories { mavenCentral() }
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.postgresql:postgresql")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+
+    // iText 8 for PDF Generation
+    implementation("com.itextpdf:layout:8.0.5")
+    implementation("com.itextpdf:kernel:8.0.5")
+    implementation("com.itextpdf:io:8.0.5")
+    implementation("com.itextpdf:bouncy-castle-connector:8.0.5")
+
+    // Apache POI for Excel Generation
+    implementation("org.apache.poi:poi:5.4.0")
+    implementation("org.apache.poi:poi-ooxml:5.4.0")
+
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = "21"
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+    }
 }

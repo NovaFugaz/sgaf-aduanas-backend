@@ -1,0 +1,22 @@
+server:
+  port: 8084
+
+sgaf:
+  tramites-url: ${TRAMITES_URL:http://ms-tramites:8082}
+  auditoria-url: ${AUDITORIA_URL:http://ms-auditoria:8085}
+
+springdoc:
+  api-docs:
+    path: /api/reportes/v3/api-docs
+  swagger-ui:
+    path: /api/reportes/swagger-ui.html
+    use-root-path: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
