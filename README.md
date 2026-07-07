@@ -42,11 +42,41 @@ docker compose ps -a
 The stack exposes the following endpoints through Traefik:
 
 - `http://localhost/api/auth` -> `ms-auth` (Go, container port `8080`)
+  - `POST /api/auth/login` - Authenticate user credentials
+  - `POST /api/auth/refresh` - Refresh active session token
+  - `POST /api/auth/logout` - End current user session
+  - `GET /api/auth/validate` - Validate current session token
+  - `GET /api/auth/me` - Get current user profile details
 - `http://localhost/api/usuarios` -> `ms-usuarios` (Kotlin, container port `8081`)
+  - `GET /api/usuarios` - List or filter users
+  - `GET /api/usuarios/{id}` - Retrieve user by ID
+  - `POST /api/usuarios` - Create new user account
+  - `PUT /api/usuarios/{id}` - Modify user details
+  - `DELETE /api/usuarios/{id}` - Delete user profile
+  - `GET /api/usuarios/por-aduana/{aduana}` - Filter users by aduana
 - `http://localhost/api/tramites` -> `ms-tramites` (Kotlin, container port `8082`)
+  - `POST /api/tramites` - File a new tramite
+  - `GET /api/tramites` - List and filter tramites (paginated)
+  - `GET /api/tramites/{id}` - Retrieve tramite details by ID
+  - `PATCH /api/tramites/{id}/estado` - Transition tramite state (requires Funcionador/Admin)
+  - `GET /api/tramites/{id}/documento` - Retrieve printable document details (SALIDA_VEHICULO/AUTORIZACION_MENOR)
+  - `GET /api/tramites/mis-tramites` - Retrieve passenger's recent tramites (last 30 days)
 - `http://localhost/api/integraciones` -> `ms-integraciones` (Go, container port `8083`)
+  - `POST /api/integraciones/pdi/consultar-rut` - Query RUT database in PDI mock API
+  - `POST /api/integraciones/sag/validar-declaracion` - Validate SAG declaration status
+  - `POST /api/integraciones/aduana-argentina/consultar-vehiculo` - Query Argentine vehicle data
+  - `GET /api/integraciones/estado` - Retrieve mock integration health/status details
 - `http://localhost/api/reportes` -> `ms-reportes` (Kotlin, container port `8084`)
+  - `GET /api/reportes/flujo-diario` - Fetch daily flow statistics
+  - `GET /api/reportes/flujo-semanal` - Fetch weekly flow statistics
+  - `GET /api/reportes/vehiculos` - Fetch vehicle statistics
+  - `GET /api/reportes/dashboard` - Retrieve dashboard status overview
+  - `GET /api/reportes/exportar` - Export report data
 - `http://localhost/api/auditoria` -> `ms-auditoria` (Go, container port `8085`)
+  - `POST /api/auditoria/eventos` - Publish an audit event
+  - `GET /api/auditoria/eventos` - Search/retrieve audit logs
+  - `GET /api/auditoria/eventos/resumen` - Get summary metrics of audit logs
+  - `GET /api/auditoria/eventos/exportar` - Export audit events data
 
 Infrastructure services:
 
