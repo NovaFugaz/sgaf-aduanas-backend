@@ -140,3 +140,14 @@ git rm -r --cached ms-reportes/.gradle ms-reportes/build ms-tramites/.gradle ms-
 ```
 
 - If Traefik routing is not working, verify the service labels and that `traefik` is healthy.
+
+## Postman collection
+
+A Postman collection is available at [sgaf-aduanas.postman_collection.json](file:///c:/Users/nacch/Desktop/sgaf-aduanas-backend/sgaf-aduanas.postman_collection.json) to test all the microservices.
+
+### How to use:
+1. Open Postman.
+2. Click **Import** and select the [sgaf-aduanas.postman_collection.json](file:///c:/Users/nacch/Desktop/sgaf-aduanas-backend/sgaf-aduanas.postman_collection.json) file.
+3. Ensure the collection variable `baseUrl` is set to `http://localhost`.
+4. Run any of the login requests under the **Authentication (ms-auth)** folder (e.g., *Login as Admin*). This will execute a script that automatically populates the `token`, `userId`, `userRol`, and `userAduana` collection variables.
+5. All requests to **Usuarios** and **Trámites** will automatically consume these variables in their headers to authorize your requests.

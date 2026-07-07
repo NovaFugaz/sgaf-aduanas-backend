@@ -1,0 +1,1153 @@
+{
+	"info": {
+		"_postman_id": "76b4a3a1-7c98-4903-b09e-71172a6b2de5",
+		"name": "SGAF Aduanas API",
+		"description": "Postman Collection to test all microservices in the SGAF Aduanas backend.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication (ms-auth)",
+			"item": [
+				{
+					"name": "Login as Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = typeof pm !== 'undefined' ? pm.response.json() : res.getBody();",
+									"var setVar = function(key, value) {",
+									"    if (typeof pm !== 'undefined') {",
+									"        pm.collectionVariables.set(key, value);",
+									"    } else if (typeof bru !== 'undefined') {",
+									"        bru.setVar(key, value);",
+									"    }",
+									"};",
+									"if (jsonData && jsonData.data && jsonData.data.access_token) {",
+									"    setVar(\"token\", jsonData.data.access_token);",
+									"}",
+									"if (jsonData && jsonData.data && jsonData.data.user) {",
+									"    setVar(\"userId\", jsonData.data.user.id);",
+									"    setVar(\"userRol\", jsonData.data.user.rol);",
+									"    setVar(\"userAduana\", jsonData.data.user.aduana || \"\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"run\": \"admin001\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login as Pasajero",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = typeof pm !== 'undefined' ? pm.response.json() : res.getBody();",
+									"var setVar = function(key, value) {",
+									"    if (typeof pm !== 'undefined') {",
+									"        pm.collectionVariables.set(key, value);",
+									"    } else if (typeof bru !== 'undefined') {",
+									"        bru.setVar(key, value);",
+									"    }",
+									"};",
+									"if (jsonData && jsonData.data && jsonData.data.access_token) {",
+									"    setVar(\"token\", jsonData.data.access_token);",
+									"}",
+									"if (jsonData && jsonData.data && jsonData.data.user) {",
+									"    setVar(\"userId\", jsonData.data.user.id);",
+									"    setVar(\"userRol\", jsonData.data.user.rol);",
+									"    setVar(\"userAduana\", jsonData.data.user.aduana || \"\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"run\": \"12345678-9\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login as Funcionario",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = typeof pm !== 'undefined' ? pm.response.json() : res.getBody();",
+									"var setVar = function(key, value) {",
+									"    if (typeof pm !== 'undefined') {",
+									"        pm.collectionVariables.set(key, value);",
+									"    } else if (typeof bru !== 'undefined') {",
+									"        bru.setVar(key, value);",
+									"    }",
+									"};",
+									"if (jsonData && jsonData.data && jsonData.data.access_token) {",
+									"    setVar(\"token\", jsonData.data.access_token);",
+									"}",
+									"if (jsonData && jsonData.data && jsonData.data.user) {",
+									"    setVar(\"userId\", jsonData.data.user.id);",
+									"    setVar(\"userRol\", jsonData.data.user.rol);",
+									"    setVar(\"userAduana\", jsonData.data.user.aduana || \"\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"run\": \"87654321-0\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Profile (Me)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"me"
+							]
+						}
+					}
+				},
+				{
+					"name": "Validate Token",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/validate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"validate"
+							]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Usuarios (ms-usuarios)",
+			"item": [
+				{
+					"name": "List Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}"
+							},
+							{
+								"key": "X-User-Rol",
+								"value": "{{userRol}}"
+							},
+							{
+								"key": "X-User-Aduana",
+								"value": "{{userAduana}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/usuarios",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"usuarios"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}"
+							},
+							{
+								"key": "X-User-Rol",
+								"value": "{{userRol}}"
+							},
+							{
+								"key": "X-User-Aduana",
+								"value": "{{userAduana}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/usuarios/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"usuarios",
+								"{{userId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Users by Aduana",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}"
+							},
+							{
+								"key": "X-User-Rol",
+								"value": "{{userRol}}"
+							},
+							{
+								"key": "X-User-Aduana",
+								"value": "{{userAduana}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/usuarios/por-aduana/LOS_LIBERTADORES",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"usuarios",
+								"por-aduana",
+								"LOS_LIBERTADORES"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}"
+							},
+							{
+								"key": "X-User-Rol",
+								"value": "{{userRol}}"
+							},
+							{
+								"key": "X-User-Aduana",
+								"value": "{{userAduana}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"run\": \"99999999-9\",\n    \"nombre\": \"Juan Pérez\",\n    \"correo\": \"juan.perez@sgaf.cl\",\n    \"password\": \"password123\",\n    \"rol\": \"PASAJERO\",\n    \"aduana\": null\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/usuarios",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"usuarios"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Trámites (ms-tramites)",
+			"item": [
+				{
+					"name": "Create Tramite (SAG)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = typeof pm !== 'undefined' ? pm.response.json() : res.getBody();",
+									"if (jsonData && jsonData.data && jsonData.data.id) {",
+									"    if (typeof pm !== 'undefined') {",
+									"        pm.collectionVariables.set(\"tramiteId\", jsonData.data.id);",
+									"    } else if (typeof bru !== 'undefined') {",
+									"        bru.setVar(\"tramiteId\", jsonData.data.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}"
+							},
+							{
+								"key": "X-User-Rol",
+								"value": "{{userRol}}"
+							},
+							{
+								"key": "X-User-Aduana",
+								"value": "{{userAduana}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tipo\": \"DECLARACION_SAG\",\n    \"metadata\": {\n        \"paisOrigen\": \"Argentina\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tramites",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tramites"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Tramite (Autorización Menor)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = typeof pm !== 'undefined' ? pm.response.json() : res.getBody();",
+									"if (jsonData && jsonData.data && jsonData.data.id) {",
+									"    if (typeof pm !== 'undefined') {",
+									"        pm.collectionVariables.set(\"tramiteId\", jsonData.data.id);",
+									"    } else if (typeof bru !== 'undefined') {",
+									"        bru.setVar(\"tramiteId\", jsonData.data.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}"
+							},
+							{
+								"key": "X-User-Rol",
+								"value": "{{userRol}}"
+							},
+							{
+								"key": "X-User-Aduana",
+								"value": "{{userAduana}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tipo\": \"AUTORIZACION_MENOR\",\n    \"metadata\": {\n        \"nombreMenor\": \"Lucas González\",\n        \"nombreAdultoResponsable\": \"Carlos Rodríguez\",\n        \"rutAdultoResponsable\": \"87654321-0\",\n        \"numeroDocumentoAdulto\": \"11223344\",\n        \"tipoDocumentoAdulto\": \"cedula\",\n        \"relacionConMenor\": \"padre\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tramites",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tramites"
+							]
+						}
+					}
+				},
+				{
+					"name": "List Tramites",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}"
+							},
+							{
+								"key": "X-User-Rol",
+								"value": "{{userRol}}"
+							},
+							{
+								"key": "X-User-Aduana",
+								"value": "{{userAduana}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tramites?page=0&size=20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tramites"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Tramite by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}"
+							},
+							{
+								"key": "X-User-Rol",
+								"value": "{{userRol}}"
+							},
+							{
+								"key": "X-User-Aduana",
+								"value": "{{userAduana}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tramites/{{tramiteId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tramites",
+								"{{tramiteId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Change Tramite State",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}"
+							},
+							{
+								"key": "X-User-Rol",
+								"value": "{{userRol}}"
+							},
+							{
+								"key": "X-User-Aduana",
+								"value": "{{userAduana}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nuevoEstado\": \"APROBADO\",\n    \"motivoRechazo\": null\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tramites/{{tramiteId}}/estado",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tramites",
+								"{{tramiteId}}",
+								"estado"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Printable Document",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}"
+							},
+							{
+								"key": "X-User-Rol",
+								"value": "{{userRol}}"
+							},
+							{
+								"key": "X-User-Aduana",
+								"value": "{{userAduana}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tramites/{{tramiteId}}/documento",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tramites",
+								"{{tramiteId}}",
+								"documento"
+							]
+						}
+					}
+				},
+				{
+					"name": "Passenger's Recent Tramites",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}"
+							},
+							{
+								"key": "X-User-Rol",
+								"value": "{{userRol}}"
+							},
+							{
+								"key": "X-User-Aduana",
+								"value": "{{userAduana}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tramites/mis-tramites",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tramites",
+								"mis-tramites"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Integraciones (ms-integraciones)",
+			"item": [
+				{
+					"name": "Query PDI RUT",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rut\": \"12345678-9\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/integraciones/pdi/consultar-rut",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"integraciones",
+								"pdi",
+								"consultar-rut"
+							]
+						}
+					}
+				},
+				{
+					"name": "Validate SAG",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tramite_id\": \"{{tramiteId}}\",\n    \"tiene_alimentos\": false,\n    \"tiene_productos_vegetales\": false,\n    \"tiene_productos_animales\": false,\n    \"tiene_mascotas\": false,\n    \"descripcion\": \"Sin nada que declarar\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/integraciones/sag/validar-declaracion",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"integraciones",
+								"sag",
+								"validar-declaracion"
+							]
+						}
+					}
+				},
+				{
+					"name": "Query Argentine Vehicle",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"patente\": \"AA123BC\",\n    \"tipo_consulta\": \"ingreso\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/integraciones/aduana-argentina/consultar-vehiculo",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"integraciones",
+								"aduana-argentina",
+								"consultar-vehiculo"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Integrations Status",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/integraciones/estado",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"integraciones",
+								"estado"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Reportes (ms-reportes)",
+			"item": [
+				{
+					"name": "Daily Flow Report",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/reportes/flujo-diario?aduana=LOS_LIBERTADORES",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reportes",
+								"flujo-diario"
+							],
+							"query": [
+								{
+									"key": "aduana",
+									"value": "LOS_LIBERTADORES"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Weekly Flow Report",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/reportes/flujo-semanal?aduana=LOS_LIBERTADORES",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reportes",
+								"flujo-semanal"
+							],
+							"query": [
+								{
+									"key": "aduana",
+									"value": "LOS_LIBERTADORES"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Vehicle Stats Report",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/reportes/vehiculos?aduana=LOS_LIBERTADORES",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reportes",
+								"vehiculos"
+							],
+							"query": [
+								{
+									"key": "aduana",
+									"value": "LOS_LIBERTADORES"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Dashboard Summary",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/reportes/dashboard?aduana=LOS_LIBERTADORES",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reportes",
+								"dashboard"
+							],
+							"query": [
+								{
+									"key": "aduana",
+									"value": "LOS_LIBERTADORES"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Export Report Data",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/reportes/exportar?aduana=LOS_LIBERTADORES&formato=csv",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reportes",
+								"exportar"
+							],
+							"query": [
+								{
+									"key": "aduana",
+									"value": "LOS_LIBERTADORES"
+								},
+								{
+									"key": "formato",
+									"value": "csv"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Auditoría (ms-auditoria)",
+			"item": [
+				{
+					"name": "Register Audit Event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}"
+							},
+							{
+								"key": "X-User-Rol",
+								"value": "{{userRol}}"
+							},
+							{
+								"key": "X-User-Aduana",
+								"value": "{{userAduana}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"entidad\": \"tramite\",\n    \"entidad_id\": \"{{tramiteId}}\",\n    \"accion\": \"CREAR\",\n    \"usuario_id\": \"{{userId}}\",\n    \"usuario_rol\": \"{{userRol}}\",\n    \"detalle\": \"Trámite creado exitosamente en la aduana\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auditoria/eventos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auditoria",
+								"eventos"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Audit Events",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}"
+							},
+							{
+								"key": "X-User-Rol",
+								"value": "{{userRol}}"
+							},
+							{
+								"key": "X-User-Aduana",
+								"value": "{{userAduana}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auditoria/eventos?entidad=tramite&limit=20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auditoria",
+								"eventos"
+							],
+							"query": [
+								{
+									"key": "entidad",
+									"value": "tramite"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Audit Summary",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}"
+							},
+							{
+								"key": "X-User-Rol",
+								"value": "{{userRol}}"
+							},
+							{
+								"key": "X-User-Aduana",
+								"value": "{{userAduana}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auditoria/eventos/resumen?entidad=tramite",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auditoria",
+								"eventos",
+								"resumen"
+							],
+							"query": [
+								{
+									"key": "entidad",
+									"value": "tramite"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Export Audit Events",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}"
+							},
+							{
+								"key": "X-User-Rol",
+								"value": "{{userRol}}"
+							},
+							{
+								"key": "X-User-Aduana",
+								"value": "{{userAduana}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auditoria/eventos/exportar?formato=json",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auditoria",
+								"eventos",
+								"exportar"
+							],
+							"query": [
+								{
+									"key": "formato",
+									"value": "json"
+								}
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userRol",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userAduana",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "tramiteId",
+			"value": "d3b07384-d113-4ec2-a4f7-fc30f28e2025",
+			"type": "string"
+		}
+	]
+}
