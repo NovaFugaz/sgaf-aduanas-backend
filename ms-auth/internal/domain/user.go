@@ -3,76 +3,95 @@ package domain
 import (
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
+// Role constants
 const (
-	RoleAdministrador = "ADMINISTRADOR"
-	RoleFuncionario   = "FUNCIONARIO"
-	RolePasajero      = "PASAJERO"
+	RoleADMINISTRADOR = "ADMINISTRADOR"
+	RoleFUNCIONARIO   = "FUNCIONARIO"
+	RolePASAJERO      = "PASAJERO"
 )
 
+// User represents a system user
 type User struct {
-	ID           string    `db:"id"`
-	RUN          string    `db:"run"`
-	Nombre       string    `db:"nombre"`
-	Correo       string    `db:"correo"`
-	PasswordHash string    `db:"password_hash"`
-	Rol          string    `db:"rol"`
-	Aduana       *string   `db:"aduana"`
-	Activo       bool      `db:"activo"`
-	CreatedAt    time.Time `db:"created_at"`
-	UpdatedAt    time.Time `db:"updated_at"`
+	ID           uuid.UUID
+	RUN          string
+	Nombre       string
+	Correo       string
+	PasswordHash string
+	Rol          string
+	Aduana       *string // nullable for PASAJERO
+	Activo       bool
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
+// Claims represents JWT token claims
+type Claims struct {
+	JTI    string `json:"jti"`
+	Sub    string `json:"sub"`
+	RUN    string `json:"run"`
+	Nombre string `json:"nombre"`
+	Rol    string `json:"rol"`
+	Aduana string `json:"aduana,omitempty"`
+	Iat    int64  `json:"iat"`
+	Exp    int64  `json:"exp"`
+}
+
+// UserResponse is the user info sent to clients (no password)
 type UserResponse struct {
-	ID     string  `json:"id"`
-	Nombre string  `json:"nombre"`
-	Rol    string  `json:"rol"`
-	Aduana *string `json:"aduana"`
+	ID     string `json:"id"`
+	RUN    string `json:"run"`
+	Nombre string `json:"nombre"`
+	Correo string `json:"correo"`
+	Rol    string `json:"rol"`
+	Aduana string `json:"aduana,omitempty"`
+	Activo bool   `json:"activo"`
 }
 
-func (u *User) ToResponse() *UserResponse {
-	return &UserResponse{
-		ID:     u.ID,
-		Nombre: u.Nombre,
-		Rol:    u.Rol,
-		Aduana: u.Aduana,
-	}
+// LoginRequest is the request body for login
+type LoginRequest struct {
+	RUN      string `json:"run" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
-type JWTClaims struct {
-	JTI    string  `json:"jti"`
-	Sub    string  `json:"sub"`
-	RUN    string  `json:"run"`
-	Nombre string  `json:"nombre"`
-	Rol    string  `json:"rol"`
-	Aduana *string `json:"aduana,omitempty"`
-	IAT    int64   `json:"iat"`
-	EXP    int64   `json:"exp"`
+// LoginResponse is the response for successful login
+type LoginResponse struct {
+	AccessToken  string       `json:"access_token"`
+	RefreshToken string       `json:"refresh_token"`
+	ExpiresIn    int          `json:"expires_in"`
+	User         UserResponse `json:"user"`
 }
 
-// Implement jwt.Claims interface
-func (c *JWTClaims) GetExpirationTime() (*jwt.NumericDate, error) {
-	return jwt.NewNumericDate(time.Unix(c.EXP, 0)), nil
+// RefreshRequest is the request body for token refresh
+type RefreshRequest struct {
+	RefreshToken string `json:"refresh_token" binding:"required"`
 }
 
-func (c *JWTClaims) GetIssuedAt() (*jwt.NumericDate, error) {
-	return jwt.NewNumericDate(time.Unix(c.IAT, 0)), nil
+// RefreshResponse is the response for token refresh
+type RefreshResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	ExpiresIn    int    `json:"expires_in"`
 }
 
-func (c *JWTClaims) GetNotBefore() (*jwt.NumericDate, error) {
-	return nil, nil
+// HealthResponse is the response for health check
+type HealthResponse struct {
+	Status   string `json:"status"`
+	Postgres string `json:"postgres"`
+	Redis    string `json:"redis"`
 }
 
-func (c *JWTClaims) GetIssuer() (string, error) {
-	return "sgaf-auth", nil
+// ErrorResponse is the standard error response
+type ErrorResponse struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+	Field   string `json:"field,omitempty"`
 }
 
-func (c *JWTClaims) GetSubject() (string, error) {
-	return c.Sub, nil
-}
-
-func (c *JWTClaims) GetAudience() (jwt.ClaimStrings, error) {
-	return jwt.ClaimStrings{"sgaf"}, nil
+// APIResponse is the standard response envelope
+type APIResponse struct {
+	Data  interface{}   `json:"data"`
+	Error *ErrorResponse `json:"error"`
 }

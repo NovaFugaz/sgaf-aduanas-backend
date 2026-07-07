@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/sgaf/ms-auth/internal/domain"
 )
@@ -18,29 +19,33 @@ func NewUserRepository(pool *pgxpool.Pool) *UserRepository {
 
 func (r *UserRepository) FindByRUN(ctx context.Context, run string) (*domain.User, error) {
 	user := &domain.User{}
+	var id string
 	err := r.pool.QueryRow(ctx,
 		"SELECT id, run, nombre, correo, password_hash, rol, aduana, activo, created_at, updated_at FROM users WHERE run = $1",
 		run,
-	).Scan(&user.ID, &user.RUN, &user.Nombre, &user.Correo, &user.PasswordHash, &user.Rol, &user.Aduana, &user.Activo, &user.CreatedAt, &user.UpdatedAt)
+	).Scan(&id, &user.RUN, &user.Nombre, &user.Correo, &user.PasswordHash, &user.Rol, &user.Aduana, &user.Activo, &user.CreatedAt, &user.UpdatedAt)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to find user by RUN: %w", err)
 	}
 
+	user.ID, _ = uuid.Parse(id)
 	return user, nil
 }
 
 func (r *UserRepository) FindByID(ctx context.Context, id string) (*domain.User, error) {
 	user := &domain.User{}
+	var userID string
 	err := r.pool.QueryRow(ctx,
 		"SELECT id, run, nombre, correo, password_hash, rol, aduana, activo, created_at, updated_at FROM users WHERE id = $1",
 		id,
-	).Scan(&user.ID, &user.RUN, &user.Nombre, &user.Correo, &user.PasswordHash, &user.Rol, &user.Aduana, &user.Activo, &user.CreatedAt, &user.UpdatedAt)
+	).Scan(&userID, &user.RUN, &user.Nombre, &user.Correo, &user.PasswordHash, &user.Rol, &user.Aduana, &user.Activo, &user.CreatedAt, &user.UpdatedAt)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to find user by ID: %w", err)
 	}
 
+	user.ID, _ = uuid.Parse(userID)
 	return user, nil
 }
 

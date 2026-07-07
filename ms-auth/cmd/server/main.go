@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -23,14 +24,16 @@ func main() {
 	logger := config.InitLogger()
 	defer logger.Sync()
 
+	ctx := context.Background()
+
 	// Initialize database connections
-	pgPool, err := db.NewPostgresPool(cfg, logger)
+	pgPool, err := db.NewPostgresPool(ctx, cfg.PostgresDSN)
 	if err != nil {
 		logger.Fatal("failed to initialize postgres", zap.Error(err))
 	}
 	defer pgPool.Close()
 
-	redisClient, err := db.NewRedisClient(cfg, logger)
+	redisClient, err := db.NewRedisClient(ctx, cfg.RedisURL)
 	if err != nil {
 		logger.Fatal("failed to initialize redis", zap.Error(err))
 	}
@@ -57,8 +60,9 @@ func main() {
 	r.GET("/api/auth/me", middleware.RequireAuth(cfg, redisClient, logger), handler.NewAuthHandler(authService, logger).Me)
 
 	// Start server
+	addr := fmt.Sprintf(":%d", cfg.Port)
 	srv := &http.Server{
-		Addr:              ":" + cfg.Port,
+		Addr:              addr,
 		Handler:           r,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
@@ -75,10 +79,10 @@ func main() {
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	<-sigChan
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	if err := srv.Shutdown(ctx); err != nil {
+	if err := srv.Shutdown(shutdownCtx); err != nil {
 		logger.Error("server shutdown error", zap.Error(err))
 	}
 	logger.Info("server stopped")

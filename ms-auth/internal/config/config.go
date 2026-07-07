@@ -1,59 +1,87 @@
 package config
 
 import (
-	"log"
+	"fmt"
 	"os"
+	"strconv"
 
 	"go.uber.org/zap"
 )
 
 type Config struct {
-	Port            string
+	Port            int
 	PostgresDSN     string
 	RedisURL        string
 	JWTSecret       string
-	AccessTokenTTL  int // seconds
-	RefreshTokenTTL int // seconds
 	Environment     string
+	AccessTokenTTL  int
+	RefreshTokenTTL int
+	RateLimitPerMin int
 }
 
 func Load() *Config {
-	cfg := &Config{
-		Port:            getEnv("PORT", "8080"),
-		PostgresDSN:     getEnv("POSTGRES_DSN", "postgres://sgaf:changeme@postgres:5432/sgaf_main"),
-		RedisURL:        getEnv("REDIS_URL", "redis://redis:6379"),
-		JWTSecret:       os.Getenv("JWT_SECRET"),
-		AccessTokenTTL:  900,    // 15 minutes
-		RefreshTokenTTL: 604800, // 7 days
-		Environment:     getEnv("ENVIRONMENT", "development"),
+	port := parseEnvInt("PORT", 8080)
+	postgresDSN := os.Getenv("POSTGRES_DSN")
+	if postgresDSN == "" {
+		postgresDSN = "postgres://sgaf:changeme@localhost:5432/sgaf_main"
 	}
 
-	if cfg.JWTSecret == "" || len(cfg.JWTSecret) < 32 {
-		log.Fatal("JWT_SECRET must be set and at least 32 characters long")
+	redisURL := os.Getenv("REDIS_URL")
+	if redisURL == "" {
+		redisURL = "redis://localhost:6379"
 	}
 
-	return cfg
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		panic("JWT_SECRET environment variable is required and must be at least 32 bytes")
+	}
+	if len(jwtSecret) < 32 {
+		panic("JWT_SECRET must be at least 32 bytes long")
+	}
+
+	environment := os.Getenv("ENVIRONMENT")
+	if environment == "" {
+		environment = "development"
+	}
+
+	return &Config{
+		Port:            port,
+		PostgresDSN:     postgresDSN,
+		RedisURL:        redisURL,
+		JWTSecret:       jwtSecret,
+		Environment:     environment,
+		AccessTokenTTL:  15 * 60, // 15 minutes
+		RefreshTokenTTL: 7 * 24 * 60 * 60, // 7 days
+		RateLimitPerMin: 10,
+	}
 }
 
-func getEnv(key, defaultVal string) string {
-	if value, exists := os.LookupEnv(key); exists {
-		return value
+func parseEnvInt(key string, defaultVal int) int {
+	if val := os.Getenv(key); val != "" {
+		if intVal, err := strconv.Atoi(val); err == nil {
+			return intVal
+		}
 	}
 	return defaultVal
+}
+
+func (c *Config) String() string {
+	return fmt.Sprintf("Config{Port: %d, Env: %s, PostgresDSN: %s, RedisURL: %s}", c.Port, c.Environment, c.PostgresDSN, c.RedisURL)
 }
 
 func InitLogger() *zap.Logger {
 	var logger *zap.Logger
 	var err error
 
-	if os.Getenv("ENVIRONMENT") == "production" {
+	environment := os.Getenv("ENVIRONMENT")
+	if environment == "production" {
 		logger, err = zap.NewProduction()
 	} else {
 		logger, err = zap.NewDevelopment()
 	}
 
 	if err != nil {
-		log.Fatal("failed to create logger", err)
+		panic(fmt.Sprintf("failed to create logger: %v", err))
 	}
 
 	return logger

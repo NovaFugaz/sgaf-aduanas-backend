@@ -2,52 +2,41 @@ package db
 
 import (
 	"context"
-	"embed"
 	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/sgaf/ms-auth/internal/config"
-	"go.uber.org/zap"
 )
 
-//go:embed migrations/*.sql
-var migrationsFS embed.FS
+func NewPostgresPool(ctx context.Context, dsn string) (*pgxpool.Pool, error) {
+	config, err := pgxpool.ParseConfig(dsn)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse postgres config: %w", err)
+	}
 
-func NewPostgresPool(cfg *config.Config, logger *zap.Logger) (*pgxpool.Pool, error) {
-	pool, err := pgxpool.New(context.Background(), cfg.PostgresDSN)
+	config.MaxConns = 25
+	config.MinConns = 5
+
+	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create postgres pool: %w", err)
 	}
 
-	// Test connection
-	err = pool.Ping(context.Background())
-	if err != nil {
+	if err := pool.Ping(ctx); err != nil {
 		return nil, fmt.Errorf("failed to ping postgres: %w", err)
-	}
-
-	logger.Info("postgres connected successfully")
-
-	// Run migrations
-	if err := runMigrations(pool, logger); err != nil {
-		return nil, fmt.Errorf("failed to run migrations: %w", err)
 	}
 
 	return pool, nil
 }
 
-func runMigrations(pool *pgxpool.Pool, logger *zap.Logger) error {
-	ctx := context.Background()
-
-	// Read migration file
-	migrationSQL, err := migrationsFS.ReadFile("migrations/001_create_users.sql")
-	if err != nil {
-		return fmt.Errorf("failed to read migration file: %w", err)
+func CheckPostgres(ctx context.Context, pool *pgxpool.Pool) bool {
+	if pool == nil {
+		return false
 	}
-
-	// Execute migration
-	_, err = pool.Exec(ctx, string(migrationSQL))
-	if err != nil {
-		logger.Error("migration already applied or error", zap.Error(err))
+	if err := pool.Ping(ctx); err != nil {
+		return false
+	}
+	return true
+}
 		// Don't fail if migration already exists
 	}
 

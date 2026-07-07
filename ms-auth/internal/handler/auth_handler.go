@@ -111,20 +111,35 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
-	claims, exists := c.Get("claims")
-	if !exists {
+	// Get token from Authorization header
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
 		c.JSON(http.StatusUnauthorized, Response{
 			Data: nil,
 			Error: &ErrorInfo{
 				Code:    "UNAUTHORIZED",
-				Message: "no claims in context",
+				Message: "missing authorization header",
 			},
 		})
 		return
 	}
 
-	jwtClaims := claims.(*domain.JWTClaims)
-	err := h.authService.Logout(c.Request.Context(), jwtClaims.JTI)
+	// Extract Bearer token
+	var tokenString string
+	if len(authHeader) > 7 && authHeader[:7] == "Bearer " {
+		tokenString = authHeader[7:]
+	} else {
+		c.JSON(http.StatusUnauthorized, Response{
+			Data: nil,
+			Error: &ErrorInfo{
+				Code:    "UNAUTHORIZED",
+				Message: "invalid authorization header format",
+			},
+		})
+		return
+	}
+
+	err := h.authService.Logout(c.Request.Context(), tokenString)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, Response{
 			Data: nil,
@@ -136,7 +151,10 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusOK, Response{
+		Data:  nil,
+		Error: nil,
+	})
 }
 
 func (h *AuthHandler) Validate(c *gin.Context) {

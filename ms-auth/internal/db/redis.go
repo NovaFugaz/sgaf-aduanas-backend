@@ -5,24 +5,29 @@ import (
 	"fmt"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/sgaf/ms-auth/internal/config"
-	"go.uber.org/zap"
 )
 
-func NewRedisClient(cfg *config.Config, logger *zap.Logger) (*redis.Client, error) {
-	opt, err := redis.ParseURL(cfg.RedisURL)
+func NewRedisClient(ctx context.Context, url string) (*redis.Client, error) {
+	opt, err := redis.ParseURL(url)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse redis URL: %w", err)
+		return nil, fmt.Errorf("failed to parse redis url: %w", err)
 	}
 
 	client := redis.NewClient(opt)
 
-	// Test connection
-	err = client.Ping(context.Background()).Err()
-	if err != nil {
+	if err := client.Ping(ctx).Err(); err != nil {
 		return nil, fmt.Errorf("failed to ping redis: %w", err)
 	}
 
-	logger.Info("redis connected successfully")
 	return client, nil
+}
+
+func CheckRedis(ctx context.Context, client *redis.Client) bool {
+	if client == nil {
+		return false
+	}
+	if err := client.Ping(ctx).Err(); err != nil {
+		return false
+	}
+	return true
 }

@@ -21,7 +21,7 @@ CREATE INDEX IF NOT EXISTS idx_users_run ON users(run);
 
 INSERT INTO users (run, nombre, correo, password_hash, rol, aduana, activo)
 VALUES 
-    ('12345678-9', 'María González', 'maria@sgaf.cl', '$2a$12$R9h/cIPz0gi.URNNX3kh2OPST9/PgBkqquzi.Ss7KIUgO2t0jWMUW', 'PASAJERO', NULL, true),
-    ('87654321-0', 'Carlos Rodríguez', 'carlos@sgaf.cl', '$2a$12$R9h/cIPz0gi.URNNX3kh2OPST9/PgBkqquzi.Ss7KIUgO2t0jWMUW', 'FUNCIONARIO', 'Los Libertadores', true),
+    ('12345678-9', 'María González Pérez', 'maria.gonzalez@sgaf.cl', '$2a$12$R9h/cIPz0gi.URNNX3kh2OPST9/PgBkqquzi.Ss7KIUgO2t0jWMUW', 'PASAJERO', NULL, true),
+    ('87654321-0', 'Carlos Rodríguez Martínez', 'carlos.rodriguez@sgaf.cl', '$2a$12$R9h/cIPz0gi.URNNX3kh2OPST9/PgBkqquzi.Ss7KIUgO2t0jWMUW', 'FUNCIONARIO', 'Los Libertadores', true),
     ('admin001', 'Administrador SGAF', 'admin@sgaf.cl', '$2a$12$R9h/cIPz0gi.URNNX3kh2OPST9/PgBkqquzi.Ss7KIUgO2t0jWMUW', 'ADMINISTRADOR', 'Los Libertadores', true)
 ON CONFLICT (run) DO NOTHING;
