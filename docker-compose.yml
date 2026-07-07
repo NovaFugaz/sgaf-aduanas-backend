@@ -9,6 +9,12 @@ services:
       - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U ${POSTGRES_USER:-sgaf} -d ${POSTGRES_DB_MAIN:-sgaf_main} -h localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
 
   redis:
     image: redis:7-alpine
@@ -35,8 +41,10 @@ services:
   ms-auth:
     build: ./ms-auth
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
     environment:
       - PORT=${MS_AUTH_PORT}
       - POSTGRES_DSN=${POSTGRES_DSN}
@@ -50,7 +58,8 @@ services:
   ms-usuarios:
     build: ./ms-usuarios
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       - PORT=${MS_USUARIOS_PORT}
     labels:
@@ -60,7 +69,8 @@ services:
   ms-tramites:
     build: ./ms-tramites
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       - PORT=${MS_TRAMITES_PORT}
     labels:
@@ -70,7 +80,8 @@ services:
   ms-integraciones:
     build: ./ms-integraciones
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       - PORT=${MS_INTEGRACIONES_PORT}
     labels:
@@ -80,7 +91,8 @@ services:
   ms-reportes:
     build: ./ms-reportes
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       - PORT=${MS_REPORTES_PORT}
     labels:
@@ -90,7 +102,8 @@ services:
   ms-auditoria:
     build: ./ms-auditoria
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       - PORT=${MS_AUDITORIA_PORT}
     labels:
