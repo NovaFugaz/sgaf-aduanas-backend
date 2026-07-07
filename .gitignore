@@ -1,0 +1,46 @@
+# Gradle / JVM
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+**/build/
+**/.gradle/
+*.class
+*.log
+*.log.*
+*.rar
+*.war
+*.ear
+*.har
+.lock
+
+# Go
+bin/
+**/bin/
+vendor/
+**/vendor/
+*.out
+*.test
+*.prof
+
+# Docker
+.env
+!.env.example
+
+# IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+
+# OS / Temp files
+.DS_Store
+Thumbs.db
+tmp/
+**/tmp/
+temp/
+**/temp/
