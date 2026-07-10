@@ -15,17 +15,31 @@ services:
       timeout: 5s
       retries: 10
       start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.00'
+          memory: 512M
+        reservations:
+          memory: 256M
 
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+        reservations:
+          memory: 64M
 
   traefik:
     image: traefik:latest
     command:
       - --entryPoints.web.address=:80
-      - --api.insecure=false
+      - --api.insecure=true
       - --api.dashboard=true
       - --providers.docker=true
       - --log.level=INFO
@@ -38,6 +52,13 @@ services:
       - DOCKER_API_VERSION=1.44
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 128M
+        reservations:
+          memory: 64M
 
   ms-auth:
     build: ./ms-auth
@@ -52,9 +73,17 @@ services:
       - REDIS_URL=${REDIS_URL}
       - JWT_SECRET=${JWT_SECRET}
       - ENVIRONMENT=${ENVIRONMENT}
+      - GOMEMLIMIT=230MiB
     labels:
       - "traefik.http.routers.ms-auth.rule=PathPrefix(`/api/auth`)"
       - "traefik.http.services.ms-auth.loadbalancer.server.port=8080"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          memory: 128M
 
   ms-usuarios:
     build: ./ms-usuarios
@@ -63,9 +92,17 @@ services:
         condition: service_healthy
     environment:
       - PORT=${MS_USUARIOS_PORT}
+      - JAVA_TOOL_OPTIONS=-XX:MaxRAMPercentage=75.0
     labels:
       - "traefik.http.routers.ms-usuarios.rule=PathPrefix(`/api/usuarios`)"
       - "traefik.http.services.ms-usuarios.loadbalancer.server.port=8081"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.00'
+          memory: 512M
+        reservations:
+          memory: 256M
 
   ms-tramites:
     build: ./ms-tramites
@@ -74,9 +111,17 @@ services:
         condition: service_healthy
     environment:
       - PORT=${MS_TRAMITES_PORT}
+      - JAVA_TOOL_OPTIONS=-XX:MaxRAMPercentage=75.0
     labels:
       - "traefik.http.routers.ms-tramites.rule=PathPrefix(`/api/tramites`)"
       - "traefik.http.services.ms-tramites.loadbalancer.server.port=8082"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.00'
+          memory: 512M
+        reservations:
+          memory: 256M
 
   ms-integraciones:
     build: ./ms-integraciones
@@ -85,9 +130,17 @@ services:
         condition: service_healthy
     environment:
       - PORT=${MS_INTEGRACIONES_PORT}
+      - GOMEMLIMIT=230MiB
     labels:
       - "traefik.http.routers.ms-integraciones.rule=PathPrefix(`/api/integraciones`)"
       - "traefik.http.services.ms-integraciones.loadbalancer.server.port=8083"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          memory: 128M
 
   ms-reportes:
     build: ./ms-reportes
@@ -96,9 +149,17 @@ services:
         condition: service_healthy
     environment:
       - PORT=${MS_REPORTES_PORT}
+      - JAVA_TOOL_OPTIONS=-XX:MaxRAMPercentage=75.0
     labels:
       - "traefik.http.routers.ms-reportes.rule=PathPrefix(`/api/reportes`)"
       - "traefik.http.services.ms-reportes.loadbalancer.server.port=8084"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.00'
+          memory: 512M
+        reservations:
+          memory: 256M
 
   ms-auditoria:
     build: ./ms-auditoria
@@ -107,9 +168,17 @@ services:
         condition: service_healthy
     environment:
       - PORT=${MS_AUDITORIA_PORT}
+      - GOMEMLIMIT=230MiB
     labels:
       - "traefik.http.routers.ms-auditoria.rule=PathPrefix(`/api/auditoria`)"
       - "traefik.http.services.ms-auditoria.loadbalancer.server.port=8085"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          memory: 128M
 
 volumes:
   db-data:
